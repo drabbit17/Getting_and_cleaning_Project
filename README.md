@@ -5,11 +5,11 @@ Then, only some columns of interest are isolated from the initial dataset, that 
 The run_analysis.R script can be broken down in 5 main subsections 
 
 A) the dataset set up
-	This part includes all the steps necessary to load the data of interest from the different txt files
+- This part includes all the steps necessary to load the data of interest from the different txt files
 
 B) 1) the merge between the test and train dataset 4) the labelling of the different row and column variables
-	In this section columns and rows are labelled taking from the the text files including Subjects and Activities identifiers, that are subject_test.txt and features.txt
-	Then the train and the test dataset after having been labelled are merged using the rbind command.
+- In this section columns and rows are labelled taking from the the text files including Subjects and Activities identifiers, that are subject_test.txt and features.txt
+- Then the train and the test dataset after having been labelled are merged using the rbind command.
 
 C) 3) The different activities are properly labelled within the dataset
 

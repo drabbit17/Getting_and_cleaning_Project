@@ -40,63 +40,27 @@ final$Activity <- factor(final$Activity, levels=c(1,2,3,4,5,6), labels=c("WALKIN
 #################################
 # D) 2) subsample mean and std
 
-library(stringr)
-substrRight <- function(x, n){
-        substr(x, nchar(x)-n+1, nchar(x))
-} # function allowing to facilitate mean and std columns detection
-
-substrRightAlt <- function(x, n){
-        substr(x, start=0, nchar(x)-n)
-}
-
 # there are three typologies of mean and std column names:
 # 1) featureName-std()/featureName-mean()
 # 2) featureNameMean)
 # 3) featureName-std()-X/Y/Z/featureName-mean()-X/Y/Z
-#
-# in order to automatize the index position identification for all the columns including mean or std
-# three new vectors are created, in which the part of the string of interest is isolated 
 
-# the vector below allows to identify feature names for the cases 1) and 2)
-meanSt1 <- substrRight(names(final), 6) 
-ident1 <- sapply(meanSt1, function(x) ifelse(x=="mean()"|x=="-std()"| x=="yMean)", ident1<-1, ident1 <- 0)) 
-
-# the vector below allows to identify feature names for the cases 3)
-meanSt2 <- substrRight(names(final), 8) # enlarge the letters selection from the string
-meanSt2 <- substrRightAlt(meanSt2, 2) # remove the last two letters of the string, so that when we have the case 3) (e.i.name-mean()-X/Y/Z) the -X/Y/Z are removed
-ident2 <- sapply(meanSt2, function(x) ifelse(x=="mean()"|x=="-std()", ident2 <-1, ident2 <- 0))
-
-ident <- ident1+ident2 # the identified features indexs including mean or std data are included in a single file
-selected <- which(as.logical(ident))
-subsample <- final[, c(1,2,3,selected)]
-
+colNames <- c("SubID", "Activity", "group", as.character(featNames[,2]))
+names(final) <- gsub("[(),-]", "", colNames)
+subsample <- data.frame(final[1:2],final[((grepl("[Mm]ean",names(final))|grepl("std",names(final))))])
 
 #################################
 # E) 5) new dataset with averages
 
-(dim(subsample)[[2]]) # there are 72 columns including measurements for std and mean, and 3 extra columns for Subject, activity and train/test group
-
-subsample$ident <- factor(paste(subsample$SubID, subsample$Activity)) # create a unique factor for each combination of Subjects id and activity
-unique(subsample$ident) 
-# 180 Levels: 1 LAYING 1 SITTING 1 STANDING 1 WALKING 1 WALKING-DOWNSTAIRS ... 30 WALKING-UPSTAIRS 
-# identify the number of unique combinations between subjects and activities, there are 180 combinations
-
-library(plyr)
 library(dplyr)
-
-# relabel features
-result <- gsub("[[:punct:]]", "_", names(subsample)) # substitute the special symbols with _ in the column names
-result1 <- gsub("__", "", result) # remove __ 
-setnames(subsample, old=names(subsample), new=result1) # substitute previous column names with the clean ones
-
 # process to obtain the data frame including means in subgroups
-by_idSub <- group_by(subsample, ident) # create the subgroups
-cols <- names(by_idSub)[-c(1,2,3,76)] # removes the column not including features
+by_idSub <- group_by(subsample, SubID, Activity) # create the subgroups
+cols <- names(by_idSub)[-c(1,2)] # removes the column not including features
 test <- sapply(cols, function(x) substitute(mean(x), list(x=as.name(x))))
-final <- data.frame(do.call(summarise, c(list(.data=by_idSub), test)))
+finalSub <- data.frame(do.call(summarise, c(list(.data=by_idSub), test)))
 
 # export the final dataset
-write.table(final, "~/data/R/coursera/getting_cleaning_data/project/final.txt", row.name=FALSE)
+write.table(finalSub, "~/data/R/coursera/getting_cleaning_data/project/final.txt", row.name=FALSE)
 
 # alternative pipeline approach to obtain the new dataset
-subsample %>% group_by(ident) %>% alt <- summarise_each(funs(mean))
+altfinalSub <- subsample %>% group_by( SubID, Activity) %>%  summarise_each(funs(mean))

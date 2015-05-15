@@ -1,8 +1,11 @@
-# Getting and Cleaning Data Project
+# General Description
 The *run_analysis.R* script allows to analyse the content of two samples of measures from the **Human Activity Recognition Smartphone Dataset** obtained from the [UCI Machine Learning Repository](http://archive.ics.uci.edu/ml/). The two samples, test and train, include observations of different subjects included either in a test either in a train group. 
+
 Firstly the different columns are labelled according to the appropriate feature name. Then, the two datasets are merged in a unique one. Given that each row includes feature measures for a specific subject during a specific activity, an extra column including the combination "Subject_Activity" is created. 
+
 Then, only some columns of interest are isolated from the initial dataset, that are the ones including measures of the *mean* or the *standard deviation*. Using these columns a new dataset is obtained. In this the different observations (rows) are grouped according to different strata based on the combinations "Subject_Activity". Finally, using the dplyr package the mean for each different feature is estimated within each different group. Those estimates are presented in the file *final.txt* 
 
+# R Script Structure
 The *run_analysis.R* script can be broken down in **5 main subsections**. Within each of those are contained different numbered subpoints (*1)*,*2)*,..) identifying the manipulations specifically required in the assegnement: 
 
 * **A) Dataset Set Up**
